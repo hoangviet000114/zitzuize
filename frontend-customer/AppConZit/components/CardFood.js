@@ -62,6 +62,7 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontWeight: 'bold',
+    textTransform: 'uppercase'
   },
   cardCost: {
     fontWeight: 'bold',
