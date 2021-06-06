@@ -4,6 +4,7 @@ import {View, Text, Image, StyleSheet, TouchableOpacity} from 'react-native';
 //import StarRating from './StarRating';
 
 const Card = ({itemData, onPress}) => {
+  //console.log(itemData.ten_cuahang);
   return (
     <TouchableOpacity onPress={onPress}>
       <View style={styles.card}>
@@ -15,7 +16,7 @@ const Card = ({itemData, onPress}) => {
           />
         </View>
         <View style={styles.cardInfo}>
-          <Text style={styles.cardTitle}>{itemData.ten_cuahang.toUpperCase}</Text>
+          <Text style={styles.cardTitle}>{itemData.ten_cuahang}</Text>
           
           <Text numberOfLines={2} style={styles.cardDetails}>{itemData.mo_ta}</Text>
         </View>
@@ -60,6 +61,7 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontWeight: 'bold',
+    textTransform: 'uppercase'
   },
   cardDetails: {
     fontSize: 12,
