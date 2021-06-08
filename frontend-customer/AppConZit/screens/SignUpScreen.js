@@ -189,6 +189,22 @@ const SignUpScreen = ({ navigation }) => {
         }
     }
 
+    const phoneChange = (val) => {
+        if (val.length >= 10) {
+            setData({
+                ...data,
+                phoneNumber: val,
+                check_Phone: true
+            });
+        } else {
+            setData({
+                ...data,
+                phoneNumber: val,
+                check_Phone: false
+            });
+        }
+    }
+
     const handlePasswordChange = (val) => {
         setData({
             ...data,
