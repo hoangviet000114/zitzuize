@@ -9,12 +9,11 @@ import {
   Platform,
   FlatList,
   TouchableOpacity,
-  AsyncStorage,
 } from 'react-native';
 import HeaderImageScrollView, {
   TriggeringView,
 } from 'react-native-image-header-scroll-view';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import AddFoodScreen from './AddFoodScreen';
 
 import * as Animatable from 'react-native-animatable';
@@ -22,6 +21,7 @@ import * as Animatable from 'react-native-animatable';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {dataFood} from '../model/dataFood';
 
+import {host} from '../model/host';
 import CardFood from '../components/CardFood';
 
 const MIN_HEIGHT = Platform.OS === 'ios' ? 90 : 55;
@@ -58,30 +58,36 @@ const MAX_HEIGHT = 350;
 //}
 
 const CardItemDetails = ({route, navigation}) => {
-  const itemData = route.params.itemData;
+  const itemData = route.params.itemDataaa;
   const navTitleView = useRef(null);
-  const [listFood, changeListFood] = useState([]);
-  const [listCate, changeListCate] = useState([]);
+  const listFood = route.params.listFood;
+  const listCate = route.params.listCate;
+  
+  //const [listFood, changeListFood] = useState([]);
+  //const [listCate, changeListCate] = useState([]);
 
-  fetch("http://my-app-food.herokuapp.com/api/listfood?id=" + itemData.id_cuahang, {
+  /* fetch("http://192.168.1.139:8000/api/listfood?id=" + itemData.id_cuahang, {
   })
   .then((response)=>response.json())
   .then((responseJson)=>{
     changeListFood(responseJson);
   });
 
-  fetch("http://my-app-food.herokuapp.com/api/getcategory?id=" + itemData.id_cuahang, {
+  fetch("http://192.168.1.139:8000/api/getcategory?id=" + itemData.id_cuahang, {
   })
   .then((response)=>response.json())
   .then((responseJson)=>{
     changeListCate(responseJson);
-  });
+  }); */
 
   const renderItem = ({item}) => {
     return (
         <CardFood 
             itemData={item}
-            onPress={()=> navigation.navigate('AddFoodScreen', {itemData: item})}
+            onPress={()=>{ 
+              
+              navigation.navigate('AddFoodScreen', {itemData: item})
+            }}
         />
     );
   };
@@ -157,7 +163,19 @@ const CardItemDetails = ({route, navigation}) => {
       
       <View style={{paddingTop: 10}}>
         <TouchableOpacity style={styles.addFoodButton}
-          onPress={() => navigation.navigate('CartScreen')}>
+          onPress={() => {
+            /* let address;
+              AsyncStorage.getItem("ADDRESS", (err, res) => {
+                if (res)
+                {
+                    address = JSON.parse(res);
+                    console.log(address);
+                }
+              }); */
+            //AsyncStorage.setItem("VOUCHER", JSON.stringify({}));
+            AsyncStorage.removeItem("VOUCHER");
+            navigation.navigate('CartScreen', {idStore: itemData.id_cuahang});
+        }}>
           <Text style={{color:'#f8f8ff', fontSize:20, alignSelf: 'center', alignItems:'center',}}>Giỏ hàng</Text>
         </TouchableOpacity>
       </View>
@@ -228,11 +246,13 @@ const styles = StyleSheet.create({
     alignSelf: 'stretch',
     justifyContent: 'center',
     alignItems: 'center',
+    //textTransform: 'uppercase'
   },
   imageTitle: {
     color: 'white',
     backgroundColor: 'transparent',
     fontSize: 24,
+    textTransform: 'uppercase'
   },
   navTitleView: {
     height: MIN_HEIGHT,
@@ -245,6 +265,7 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 18,
     backgroundColor: 'transparent',
+    textTransform: 'uppercase'
   },
   sectionLarge: {
     minHeight: 50,
