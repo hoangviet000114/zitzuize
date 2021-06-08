@@ -5,6 +5,7 @@ import {
     TouchableOpacity, 
     TextInput,
     Platform,
+    StyleSheet,
     StatusBar,
     Alert
 } from 'react-native';
@@ -264,5 +265,3 @@ const styles = StyleSheet.create({
         fontWeight: 'bold'
     }
   });
-
-    StyleSheet,
