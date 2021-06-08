@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component, useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 
 import Swiper from 'react-native-swiper';
+import Card from '../components/Card';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Fontisto from 'react-native-vector-icons/Fontisto';
@@ -20,10 +21,14 @@ import {createStackNavigator} from '@react-navigation/stack';
 
 import Icon from 'react-native-vector-icons/Ionicons';
 import {data} from '../model/data';
+import {host} from '../model/host';
+import * as firebase from "firebase";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const HomeStack = createStackNavigator();
 
 //import axios from 'axios';
+let isStart = false;
 
 //import Config from 'react-native-config';
 
@@ -66,31 +71,159 @@ const HomeScreen = ({navigation}) => {
       query: text,
     });
   };
-*/
+  */
 
 
-/*
+  /*
 
-<View style={styles.topWrapper}>
-          <View style={styles.textInputWrapper}>
-            <TextInput
-              style={styles.textInput}
-              //onChangeText={this.onChangeQuery}
-              //value={query}
-              placeholder={'Ăn gì địt mẹ m?'}
-            />
+  <View style={styles.topWrapper}>
+            <View style={styles.textInputWrapper}>
+              <TextInput
+                style={styles.textInput}
+                //onChangeText={this.onChangeQuery}
+                //value={query}
+                placeholder={'Ăn gì địt mẹ m?'}
+              />
+            </View>
+
+            <View style={styles.buttonWrapper}>
+              <Button
+                onPress={() => this.filterList()}
+                title="Go"
+                color="#c53c3c"
+              />
+            </View>
           </View>
+  */
+      //const {foods, query} = this.state;
 
-          <View style={styles.buttonWrapper}>
-            <Button
-              onPress={() => this.filterList()}
-              title="Go"
-              color="#c53c3c"
+
+    const [listStore3, changeLS] = useState([]);
+
+    const renderItem = ({item}) => {
+
+      let xyz = item;
+        return (
+            <Card 
+                itemData={item}
+                onPress={async({item})=> {
+                  let zz = await AsyncStorage.removeItem("CART");//AsyncStorage.setItem("CART", JSON.stringify([]));
+                  let listFood;
+                  let listCate;
+                  //console.log(xyz);
+                  let xx = await fetch("http://" + host + ":8000/api/listfood?id=" + xyz.id_cuahang, {
+                  })
+                  .then((response)=>response.json())
+                  .then((responseJson)=>{
+                    listFood = responseJson;//changeListFood(responseJson);
+                  });
+  
+                  let yy = await fetch("http://" + host + ":8000/api/getcategory?id=" + xyz.id_cuahang, {
+                  })
+                  .then((response)=>response.json())
+                  .then((responseJson)=>{
+                    listCate = responseJson;//changeListCate(responseJson);
+                  });
+  
+                  navigation.navigate('CardItemDetails', {itemDataaa: xyz, listFood: listFood, listCate : listCate});
+                }}
             />
-          </View>
-        </View>
-*/
-    //const {foods, query} = this.state;
+        );
+    };
+
+    /* const Tim3NhaHang = async() => {
+      //let link = "http://" + host + ":8000/api/recommend";
+      //console.log(link);
+
+      let y = await fetch("http://" + host + ":8000/api/recommend", {
+        headers: { 
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+      })
+      .then((response)=>response.json())
+      .then((responseJson)=>{
+        changeLS(responseJson);
+        //changeListStore(responseJson);
+      });
+    }
+
+    if (isStart === false){
+      isStart = true;
+      Tim3NhaHang();
+    } */
+
+    useEffect(() => {
+      fetch("http://" + host + ":8000/api/recommend", {
+        headers: { 
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+      })
+      .then((response)=>response.json())
+      .then((responseJson)=>{
+        changeLS(responseJson);
+        //changeListStore(responseJson);
+      });
+    }, []);
+
+    const ShowList1 = async() => {
+      let temp;
+      let y = await fetch("http://" + host + ":8000/api/findname", {
+        method: 'POST',
+        headers: { 
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            'name' : foodStore,
+        })
+      })
+      .then((response)=>response.json())
+      .then((responseJson)=>{
+        temp = responseJson;
+        //changeListStore(responseJson);
+      });
+      navigation.navigate('CardListScreen', {store: temp});
+    }
+
+    const ShowList2 = async(idType) => {
+      let temp;
+      let y = await fetch("http://" + host + ":8000/api/list_res?id=" + idType, {
+        //let y = await fetch("http://my-app-food.herokuapp.com/api/list_res_voucher?id=F30", {
+        //let y = await fetch("http://my-app-food.herokuapp.com/api/list_voucher", {
+        // method: 'POST',
+        // body: JSON.stringify({
+        //     id: idType
+        // })
+      })
+      .then((response)=>response.json())
+      .then((responseJson)=>{
+        temp = responseJson;
+        console.log(temp);
+      });
+
+      //console.log(temp);    
+
+      navigation.navigate('CardListScreen', {store: temp});
+
+    }
+
+    
+
+    const [foodStore, changeFoodStore] = useState("");
+
+    const ShowListVoucher = async() => {
+      let temp;
+      let y = await fetch("http://" + host + ":8000/api/list_voucher", {
+      })
+      .then((response)=>response.json())
+      .then((responseJson)=>{
+        temp = responseJson;
+      });
+      console.log(temp);
+      navigation.navigate('ListVoucherScreen', {list: temp});
+    }
 
     return (
       <View style={styles.wrapper}>
@@ -117,14 +250,15 @@ const HomeScreen = ({navigation}) => {
               //value={query}
               textAlign={'center'}
               placeholder={'Ăn gì bạn êy?'}
+              onChangeText={(val) => changeFoodStore(val)}
             />
           </View>
 
           <View style={styles.buttonWrapper}>
             <TouchableOpacity
               style={styles.buttonWrapper}
-              onPress={() =>
-                navigation.navigate('CardListScreen')//{}//navigation.navigate('CardListScreen', {title: 'Restaurant'})
+              onPress={() => ShowList1()
+                //navigation.navigate('CardListScreen', {store: foodStore})//{}//navigation.navigate('CardListScreen', {title: 'Restaurant'})
               }>
               <View>
                 <Text style={styles.textButton}>GO</Text>
@@ -158,7 +292,7 @@ const HomeScreen = ({navigation}) => {
               </View>
               <View style={styles.slide}>
                 <Image
-                  source={require('../assets/banners/food-banner3.jpg')}
+                  source={require('../assets/banners/food-banner4.jpg')}
                   resizeMode="cover"
                   style={styles.sliderImageBanner}
                 />
@@ -169,7 +303,7 @@ const HomeScreen = ({navigation}) => {
           <View style={styles.categoryContainer}>
             <TouchableOpacity
               style={styles.categoryBtn}
-              onPress={() => navigation.navigate('CardListScreen', {idType: 1})//{}//navigation.navigate('CardListScreen', {title: 'Restaurant'})
+              onPress={() => ShowList2(1)//navigation.navigate('CardListScreen', {idType: 1})//{}//navigation.navigate('CardListScreen', {title: 'Restaurant'})
               }>
               <View style={styles.categoryIcon}>
                 <Image
@@ -185,7 +319,7 @@ const HomeScreen = ({navigation}) => {
             <TouchableOpacity
               style={styles.categoryBtn}
               onPress={() =>
-                navigation.navigate('CardListScreen', {idType: 2})//navigation.navigate('CardListScreen', {title: 'Fastfood Center'})
+                ShowList2(2)//navigation.navigate('CardListScreen', {idType: 2})//navigation.navigate('CardListScreen', {title: 'Fastfood Center'})
               }>
               <View style={styles.categoryIcon}>
                 <Image
@@ -199,7 +333,7 @@ const HomeScreen = ({navigation}) => {
             <TouchableOpacity 
               style={styles.categoryBtn} 
               onPress={() => 
-                navigation.navigate('CardListScreen', {idType: 3})
+                ShowList2(3)//navigation.navigate('CardListScreen', {idType: 3})
               }>
               <View style={styles.categoryIcon}>
                 <Image
@@ -216,7 +350,7 @@ const HomeScreen = ({navigation}) => {
             <TouchableOpacity 
               style={styles.categoryBtn} 
               onPress={() => 
-                navigation.navigate('CardListScreen', {idType: 4})
+                ShowList2(4)//navigation.navigate('CardListScreen', {idType: 4})
               }>
               <View style={styles.categoryIcon}>
                 <Image
@@ -230,7 +364,7 @@ const HomeScreen = ({navigation}) => {
             <TouchableOpacity 
               style={styles.categoryBtn} 
               onPress={() => 
-                navigation.navigate('CardListScreen', {idType: 5})
+                ShowList2(5)//navigation.navigate('CardListScreen', {idType: 5})
               }>
               <View style={styles.categoryIcon}>
                 <Image
@@ -244,7 +378,7 @@ const HomeScreen = ({navigation}) => {
             <TouchableOpacity 
               style={styles.categoryBtn} 
               onPress={() => 
-                navigation.navigate('CardListScreen', {idType: 6})
+                ShowList2(6)//navigation.navigate('CardListScreen', {idType: 6})
               }>
               <View style={styles.categoryIcon}>
                 <Image
@@ -257,6 +391,10 @@ const HomeScreen = ({navigation}) => {
             </TouchableOpacity>
           </View>
 
+          <TouchableOpacity style={styles.addFoodButton}
+            onPress={() => ShowListVoucher()}>
+            <Text style={{color:'#f8f8ff', fontSize:20, alignSelf: 'center', alignItems:'center',}}>Danh sách khuyến mãi</Text>
+          </TouchableOpacity>    
 
           <View style={styles.cardsWrapper}>
             <Text
@@ -268,7 +406,13 @@ const HomeScreen = ({navigation}) => {
               }}>
               Các quán ăn được ưa thích
             </Text>
-            <View style={styles.card}>
+
+            <FlatList 
+              data={listStore3}
+              renderItem={renderItem}
+              keyExtractor={item => item.id}
+            />
+            {/* <View style={styles.card}>
               <View style={styles.cardImgWrapper}>
                 <Image
                   source={{uri: 'https://i.imgur.com/06oYydP.jpg'}}
@@ -315,7 +459,7 @@ const HomeScreen = ({navigation}) => {
                 Cơm rang cho học sinh, sinh viên, có cả phở
                 </Text>
               </View>
-            </View>
+            </View> */}
           </View>
 
         </ScrollView>
@@ -520,6 +664,15 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#444',
   },
+  addFoodButton:{
+    borderRadius:10,
+    alignSelf: 'center',
+    backgroundColor:'#fa8072',
+    height: 30,
+    width: '80%',
+    justifyContent:'space-around',
+    
+},
 });
 
 export default HomeScreen;

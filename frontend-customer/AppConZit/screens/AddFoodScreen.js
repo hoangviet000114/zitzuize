@@ -32,11 +32,13 @@ const styles = StyleSheet.create({
  */
 
 import React,{useState} from 'react';
-import {View, Text, TouchableOpacity,ScrollView,Animated,Dimensions,StyleSheet,Image, AsyncStorage} from 'react-native';
+import {View, Text, TouchableOpacity,ScrollView,Animated,Dimensions,StyleSheet,Image} from 'react-native';
 import Entypo from 'react-native-vector-icons/Entypo';/* 
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import Ionicons from 'react-native-vector-icons/Ionicons' */
 import { DebugInstructions } from 'react-native/Libraries/NewAppScreen';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {host} from '../model/host';
 //import {Header,Button} from '../../components'; 
 const HEIGHT = Dimensions.get('screen').height
 const DISH_IMAGE_HEIGHT = HEIGHT/2-50;
@@ -119,7 +121,13 @@ export default function AddFoodScreen({route, navigation}){
                 if (!res) AsyncStorage.setItem("CART", JSON.stringify([product]));
                 else {
                     var items = JSON.parse(res);
-                    items.push(product);
+                    let tmp = false;
+                    for (i = 0; i < items.length; i++)
+                        if (items[i].idFood === product.idFood){
+                            items[i].quantity += product.quantity;
+                            tmp = true;
+                        }
+                    if (tmp === false) items.push(product);
                     AsyncStorage.setItem("CART", JSON.stringify(items));
                 }
                 console.log(res);
