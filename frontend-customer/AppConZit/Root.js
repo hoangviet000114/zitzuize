@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react';
 //import {YellowBox} from 'react-native';
 import { View, ActivityIndicator, TextInput, StyleSheet, TouchableOpacity , Text, Image} from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, DarkTheme } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
 import { AuthContext } from './components/context';
@@ -14,8 +14,17 @@ import RootStackScreen from './screens/RootStackScreen';
 import AddFoodScreen from './screens/AddFoodScreen';
 import CartScreen from './screens/CartScreen';
 import ShippingScreen from './screens/ShippingScreen';
+import ChangeAddressScreen from './screens/ChangeAddressScreen';
+import ProfileScreen from './screens/ProfileScreen';
+import ListOrderScreen from './screens/ListOrderScreen';
+import OrderAgainScreen from './screens/OrderAgainScreen';
+import ListVoucherScreen from './screens/ListVoucherScreen';
+import VoucherDetailScreen from './screens/VoucherDetailScreen';
+import ChooseVoucherScreen from './screens/ChooseVoucherScreen';
+import * as firebase from "firebase";
 
 import HomeScreen from './screens/HomeScreen';
+
 import LottieView from 'lottie-react-native';
 
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -28,7 +37,7 @@ const Router = () => {
 
   const initialLoginState = {
     isLoading: true,
-    userName: null,
+    //userName: null,
     userToken: null,
   };
 
@@ -43,21 +52,21 @@ const Router = () => {
       case 'LOGIN': 
         return {
           ...prevState,
-          userName: action.id,
+          //userName: action.id,
           userToken: action.token,
           isLoading: false,
         };
       case 'LOGOUT': 
         return {
           ...prevState,
-          userName: null,
+          //userName: null,
           userToken: null,
           isLoading: false,
         };
       case 'REGISTER': 
         return {
           ...prevState,
-          userName: action.id,
+          //userName: action.id,
           userToken: action.token,
           isLoading: false,
         };
@@ -70,16 +79,35 @@ const Router = () => {
     signIn: async(foundUser) => {
       // setUserToken('fgkj');
       // setIsLoading(false);
-      const userToken = String(foundUser[0].userToken);
-      const userName = foundUser[0].username;
+      const userToken = foundUser.ID;
+      //const userName = foundUser[0].username;
       
       try {
         await AsyncStorage.setItem('userToken', userToken);
       } catch(e) {
         console.log(e);
       }
+
+      try {
+        await AsyncStorage.setItem('NAME', foundUser.Name);
+      } catch(e) {
+        console.log(e);
+      }
+
+      try {
+        await AsyncStorage.setItem('PHONENUMBER', foundUser.PhoneNumber);
+      } catch(e) {
+        console.log(e);
+      }
+
+      try {
+        await AsyncStorage.setItem('EMAIL', foundUser.Email);
+      } catch(e) {
+        console.log(e);
+      }
+
       // console.log('user token: ', userToken);
-      dispatch({ type: 'LOGIN', id: userName, token: userToken });
+      dispatch({ type: 'LOGIN', /* id: userName, */ token: userToken });
     },
     signOut: async() => {
       // setUserToken(null);
@@ -89,6 +117,13 @@ const Router = () => {
       } catch(e) {
         console.log(e);
       }
+
+      firebase.auth().signOut().then(function() {
+        // Sign-out successful.
+      }).catch(function(error) {
+          // An error happened.
+      });
+      
       dispatch({ type: 'LOGOUT' });
     },
     signUp: () => {
@@ -140,6 +175,17 @@ const Router = () => {
             <Stack.Screen name="AddFoodScreen" component={AddFoodScreen} />
             <Stack.Screen name="CartScreen" component={CartScreen} />
             <Stack.Screen name="ShippingScreen" component={ShippingScreen} />
+            <Stack.Screen name="ChangeAddressScreen" component={ChangeAddressScreen} />
+            <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
+            <Stack.Screen name="ListOrderScreen" component={ListOrderScreen} />
+            <Stack.Screen name="OrderAgainScreen" component={OrderAgainScreen} />
+            <Stack.Screen name="ListVoucherScreen" component={ListVoucherScreen} />
+            <Stack.Screen name="VoucherDetailScreen" component={VoucherDetailScreen} />
+            
+            <Stack.Screen name="ChooseVoucherScreen" component={ChooseVoucherScreen} />
+            
+            
+            
           </Stack.Navigator>
         )
         :
