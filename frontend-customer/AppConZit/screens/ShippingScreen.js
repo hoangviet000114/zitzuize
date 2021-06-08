@@ -1,22 +1,34 @@
 import React,{useRef,useState} from 'react';
-import { View, Text, Button, FlatList, StyleSheet, AsyncStorage, TouchableOpacity, Image, Dimensions, StatusBar} from 'react-native';
+import { View, Text, Button, FlatList, StyleSheet, TouchableOpacity, Image, Dimensions, StatusBar} from 'react-native';
 import CardInBill from '../components/CardInBill';
 import HeaderImageScrollView, {
     TriggeringView,
   } from 'react-native-image-header-scroll-view';
 import * as Animatable from 'react-native-animatable';
+import {host} from '../model/host';
 
 const MIN_HEIGHT = Platform.OS === 'ios' ? 90 : 55;
 const MAX_HEIGHT = 350;
 
-const ShippingScreen = ({navigation}) => {
+const ShippingScreen = ({navigation, route}) => {
     const navTitleView = useRef(null);
 
-    const [cartItems, changeCartItems] = useState([]);
-    const [sumOfCost, setSumCost] = useState(0);
+    //const [cartItems, changeCartItems] = useState([]);
+    //const [sumOfCost, setSumCost] = useState(0);
 
-    AsyncStorage.getItem("CART", (err, res) => {
-        if (!res) changeCartItems([]);
+    const cartItems = route.params.cart;
+    const sumOfCost = route.params.sum;
+    const sale = route.params.sale;
+    const address = route.params.adr;
+    const name = route.params.yourname;
+    const sdt = route.params.sdt;
+    const shippingFee = route.params.shippingFee;
+    //console.log(name);
+    
+    //console.log(name);
+
+    /* AsyncStorage.getItem("CART", (err, res) => {
+        if (!res){}// changeCartItems([]);
         else {
             changeCartItems(JSON.parse(res));
         }
@@ -28,7 +40,11 @@ const ShippingScreen = ({navigation}) => {
             }
 
         if (sumOfCost !== temp) setSumCost(temp);
+        console.log(temp);
     }); 
+
+    AsyncStorage.setItem("CART", JSON.stringify([])); */
+    
 
     const renderItem = ({item}) => {
         return (
@@ -82,8 +98,12 @@ const ShippingScreen = ({navigation}) => {
                             <Text style={{flex: 2, fontSize: 20, fontWeight:'bold'}}> {sumOfCost}đ</Text>
                         </View>
                         <View style={{flexDirection: 'row', paddingLeft: 10}}>
+                            <Text style={{flex: 4, fontSize: 17}}>Khuyến mãi:</Text>
+                            <Text style={{flex: 2, fontSize: 20, fontWeight:'bold'}}> -{sale}đ</Text>
+                        </View>
+                        <View style={{flexDirection: 'row', paddingLeft: 10}}>
                             <Text style={{flex: 4, fontSize: 17}}>Phí giao hàng:</Text>
-                            <Text style={{flex: 2, fontSize: 20, fontWeight:'bold'}}> 15.000đ</Text>
+                            <Text style={{flex: 2, fontSize: 20, fontWeight:'bold'}}> {shippingFee}đ</Text>
                         </View>
                     </View>
 
@@ -91,26 +111,26 @@ const ShippingScreen = ({navigation}) => {
                         
                         <View style={{flexDirection: 'row', paddingLeft: 10}}>
                             <Text style={{flex: 4, fontSize: 17}}>Tổng cộng:</Text>
-                            <Text style={{flex: 2, fontSize: 20, fontWeight:'bold'}}> {sumOfCost + 15000}đ</Text>
+                            <Text style={{flex: 2, fontSize: 20, fontWeight:'bold'}}> {sumOfCost + shippingFee - sale}đ</Text>
                         </View>
                     </View>
 
                     <View style={{paddingBottom: 20, paddingTop: 20,marginTop: 20, backgroundColor: '#ffe6d7'}}>
-                        <View style={{flexDirection: 'row', paddingLeft: 10, margin: 2}}>
+                        {/* <View style={{flexDirection: 'row', paddingLeft: 10, margin: 2}}>
                             <Text style={{flex: 2, fontSize: 17}}>Mã đơn hàng:</Text>
-                            <Text style={{flex: 4, fontSize: 17, fontWeight:'bold'}}>123456</Text>
-                        </View>
+                            <Text style={{flex: 4, fontSize: 17, fontWeight:'bold'}}>13</Text>
+                        </View> */}
                         <View style={{flexDirection: 'row', paddingLeft: 10, margin: 2}}>
                             <Text style={{flex: 2, fontSize: 17}}>Tên:</Text>
-                            <Text style={{flex: 4, fontSize: 17, fontWeight:'bold'}}>Nam</Text>
+                            <Text style={{flex: 4, fontSize: 17, fontWeight:'bold'}}>{name}</Text>
                         </View>
                         <View style={{flexDirection: 'row', paddingLeft: 10, margin: 2}}>
                             <Text style={{flex: 2, fontSize: 17}}>SĐT:</Text>
-                            <Text style={{flex: 4, fontSize: 17, fontWeight:'bold'}}>0123456789</Text>
+                            <Text style={{flex: 4, fontSize: 17, fontWeight:'bold'}}>{sdt}</Text>
                         </View>
                         <View style={{flexDirection: 'row', paddingLeft: 10, margin: 2}}>
                             <Text style={{flex: 2, fontSize: 17}}>Địa chỉ:</Text>
-                            <Text style={{flex: 4, fontSize: 17, fontWeight:'bold'}}>Đại học công nghệ, đại học quốc gia Hà nội</Text>
+                            <Text style={{flex: 4, fontSize: 17, fontWeight:'bold'}}>{address}</Text>
                         </View>
                     </View>  
                 {/* </TriggeringView>  */}
