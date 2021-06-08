@@ -17,7 +17,7 @@ const CardFoodInCart = ({itemData, onPress}) => {
           />
         </View>
         <View style={styles.cardInfo}>
-          <Text style={styles.cardTitle}>{itemData.foodName}</Text>
+          <Text numberOfLines={2} style={styles.cardTitle}>{itemData.foodName}</Text>
           <Text style={styles.cardDetails}>Số lượng: {itemData.quantity}</Text>
           <Text style={styles.cardDetails}>Giá: {itemData.foodCost * itemData.quantity}</Text>
         </View>
@@ -80,6 +80,7 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontWeight: 'bold',
+    textTransform: 'uppercase'
   },
   cardDetails: {
     fontSize: 12,

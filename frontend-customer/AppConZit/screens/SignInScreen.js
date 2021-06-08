@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { 
     View, 
     Text, 
@@ -13,6 +13,8 @@ import * as Animatable from 'react-native-animatable';
 import { LinearGradient } from 'expo-linear-gradient';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Feather from 'react-native-vector-icons/Feather';
+import * as firebase from "firebase";
+import { host } from '../model/host';
 
 import { useTheme } from 'react-native-paper';
 
@@ -89,43 +91,87 @@ const SignInScreen = ({navigation}) => {
             });
         }
     }
+    
+    const loginHandle = async (userName, password) => {
 
-    const loginHandle = (userName, password) => {
-
-        fetch("http://my-app-food.herokuapp.com/api/login", {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-            email: {userName},
-            password: {password}
-            })
-        })
-        .then((response)=>response.json())
-        .then((responseJson)=>{
-            console.log(responseJson);
-            console.log("AAAAA");
-            console.log(userName);
-            console.log(password);
-        });
-
-        const foundUser = Users.filter( item => {
+        /* const foundUser = Users.filter( item => {
             return userName == item.username && password == item.password;
-        } );
+        } ); */
 
-        if ( data.username.length == 0 || data.password.length == 0 ) {
-            Alert.alert('Wrong Input!', 'Username or password field cannot be empty.', [
-                {text: 'Okay'}
+        if (data.username.length == 0 || data.password.length == 0) {
+            Alert.alert('Bạn chưa nhập tài khoản hoặc mật khẩu!', 'Mời bạn nhập lại.', [
+                { text: 'Okay' }
             ]);
             return;
         }
 
-        if ( foundUser.length == 0 ) {
-            Alert.alert('Invalid User!', 'Username or password is incorrect.', [
+        /* if ( foundUser.length == 0 ) {
+            Alert.alert('Không thể đăng nhập!', 'Bạn nhập sai tài khoản hoặc mật khẩu.', [
                 {text: 'Okay'}
             ]);
             return;
+        } */
+
+        //console.log(foundUser);
+
+
+        let qq = await firebase.auth().signInWithEmailAndPassword(userName, password)
+            .then((user) => {
+                console.log("thành công");
+                //console.log(JSON.stringify(user.uid));
+                //console.log(user.PhoneNumber);
+                //console.log(user.ID);
+            })
+            .catch((error) => {
+                var errorCode = error.code;
+                var errorMessage = error.message;
+                Alert.alert('Không thể đăng nhập!', 'Bạn nhập sai tài khoản hoặc mật khẩu.', [
+                    { text: 'Okay' }
+                ]);
+            });
+
+        let user = firebase.auth().currentUser;
+        if (user != null) {
+            //console.log(user.uid);
+            console.log(user.displayName);
+            if (user.emailVerified === false) {
+                Alert.alert('Không thể đăng nhập!', 'Email của bạn chưa được xác thực.', [
+                    { text: 'Okay' }
+                ]);
+
+
+                let qqqq = await firebase.auth().signOut().then(function () {
+                    // Sign-out successful.
+                }).catch(function (error) {
+                    // An error happened.
+                });
+            }
+            else {
+
+                //Đăng nhập
+                let yourID = user.displayName;
+                let yourName;
+                let yourPhoneNumber;
+                let email = user.email;
+                let cc = await firebase.database().ref("/User/" + yourID).once('value').then((snapshot) => {
+                    yourName = snapshot.val().Name;
+                    yourPhoneNumber = snapshot.val().phoneNumber;
+                });
+
+                let foundUser = {
+                    ID: yourID,
+                    Name: yourName,
+                    PhoneNumber: yourPhoneNumber,
+                    Email: email,
+                }
+
+                console.log(foundUser);
+
+                signIn(foundUser);
+            }
         }
-        signIn(foundUser);
+
+        //signIn(foundUser);
     }
 
     return (
